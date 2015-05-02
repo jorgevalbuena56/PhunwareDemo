@@ -55,9 +55,9 @@ public class VenueDetailFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		if (getArguments().containsKey(ARG_VENUE)) {
-			// Load the dummy content specified by the fragment
-			// arguments. In a real-world scenario, use a Loader
-			// to load content from a content provider.
+			// Load the venue specified by the fragment
+			// arguments. Instead of calling for the details, all the object is passed by to
+			// the fragment.
 			mVenue = (Venue)getArguments().getSerializable(ARG_VENUE);
 		}
 		

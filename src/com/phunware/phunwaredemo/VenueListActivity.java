@@ -13,13 +13,13 @@ import com.phunware.phunwaredemo.utils.Utils;
 /**
  * An activity representing a list of Venues. This activity has different
  * presentations for handset and tablet-size devices. On handsets, the activity
- * presents a list of items, which when touched, lead to a
- * {@link VenueDetailActivity} representing item details. On tablets, the
- * activity presents the list of items and item details side-by-side using two
+ * presents a list of venues, which when touched, lead to a
+ * {@link VenueDetailActivity} representing the venue details. On tablets, the
+ * activity presents the list of venues and venue details side-by-side using two
  * vertical panes.
  * <p>
- * The activity makes heavy use of fragments. The list of items is a
- * {@link VenueListFragment} and the item details (if present) is a
+ * The activity makes heavy use of fragments. The list of venues is a
+ * {@link VenueListFragment} and the venue details (if present) is a
  * {@link VenueDetailFragment}.
  * <p>
  * This activity also implements the required
@@ -82,6 +82,12 @@ public class VenueListActivity extends ActionBarActivity implements
 			startActivity(detailIntent);
 		}
 	}
+	/*
+	 * When the user presses on key back, instead of closing immediately the app, first I ask the 
+	 * user if he really wants to close it
+	 * (non-Javadoc)
+	 * @see android.support.v4.app.FragmentActivity#onKeyDown(int, android.view.KeyEvent)
+	 */
 	
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {

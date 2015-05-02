@@ -5,6 +5,11 @@ import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * POJO Representing the Venue
+ * @author GeorgeLocal
+ *
+ */
 public class Venue implements Serializable{
  
 	// Core fields

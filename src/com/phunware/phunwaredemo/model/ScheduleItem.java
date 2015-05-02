@@ -7,6 +7,11 @@ import java.util.Date;
 
 import com.google.gson.annotations.SerializedName;
  
+/**
+ * POJO Representing the Schedule
+ * @author GeorgeLocal
+ *
+ */
 public class ScheduleItem implements Serializable{
 	
 	private static final SimpleDateFormat FORMATTER = new SimpleDateFormat(

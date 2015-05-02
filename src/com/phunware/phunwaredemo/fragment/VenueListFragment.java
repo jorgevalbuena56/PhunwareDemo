@@ -12,7 +12,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,8 +31,8 @@ import com.phunware.phunwaredemo.utils.Utils.ViewHolderItem;
 
 /**
  * A list fragment representing a list of Venues. This fragment also supports
- * tablet devices by allowing list items to be given an 'activated' state upon
- * selection. This helps indicate which item is currently being viewed in a
+ * tablet devices by allowing list venues to be given an 'activated' state upon
+ * selection. This helps indicate which venue is currently being viewed in a
  * {@link VenueDetailFragment}.
  * <p>
  * Activities containing this fragment MUST implement the {@link Callbacks}
@@ -43,18 +42,18 @@ public class VenueListFragment extends ListFragment {
 
 	/**
 	 * The serialization (saved instance state) Bundle key representing the
-	 * activated item position. Only used on tablets.
+	 * activated venue position. Only used on tablets.
 	 */
 	private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
 	/**
 	 * A callback interface that all activities containing this fragment must
-	 * implement. This mechanism allows activities to be notified of item
+	 * implement. This mechanism allows activities to be notified of venue
 	 * selections.
 	 */
 	public interface Callbacks {
 		/**
-		 * Callback for when an item has been selected.
+		 * Callback for when an venue has been selected.
 		 */
 		public void onItemSelected(Venue venue);
 	}
@@ -75,7 +74,7 @@ public class VenueListFragment extends ListFragment {
 	private Callbacks mCallbacks = sDummyCallbacks;
 
 	/**
-	 * The current activated item position. Only used on tablets.
+	 * The current activated venue position. Only used on tablets.
 	 */
 	private int mActivatedPosition = ListView.INVALID_POSITION;
 
@@ -96,9 +95,15 @@ public class VenueListFragment extends ListFragment {
 		// Retain this fragment across configuration changes.
 	    setRetainInstance(true);
 	    
-	    retrieveDateWS();
+	    if(mVenuesList == null)
+	    	retrieveDateWS();
 	}
 
+	/**
+	 * This Method is the one in charge to connect with the Rest Service and retrieve
+	 * the venue's data. It uses Retrofit to create the http connection ans Gson to deserialize
+	 * and convert into the Venue Objet
+	 */
 	private void retrieveDateWS(){
 		
 		
@@ -107,6 +112,8 @@ public class VenueListFragment extends ListFragment {
 	    .setFieldNamingPolicy(FieldNamingPolicy.IDENTITY)
 	    .create();
 		
+		//The url is store in a properties file in the asset folder which give us flexibility
+		//if the server changes.
 		RestAdapter restAdapter = new RestAdapter.Builder()
 		.setEndpoint(ConfigFactory.getInstance(getActivity()).get("aws.url").toString())
 		.setConverter(new GsonConverter(gson))
@@ -114,15 +121,13 @@ public class VenueListFragment extends ListFragment {
 
 		VenueService service = restAdapter.create(VenueService.class);
 		
-		//final ProgressDialog dialog = Utils.getProgressDialog(getActivity(), getResources().getString(R.string.connecting), getResources().getString(R.string.retrieving_info));
-		//aq.progress(dialog);
 		
-		Callback callback = new Callback<List<Venue>>(){
+		Callback<List<Venue>> callback = new Callback<List<Venue>>(){
 		    @Override
 		    public void success(List<Venue> v, Response response) {		    	
 		    	mVenuesList = v;
 		    	
-		    	//Create the adapter for tue items in the list
+		    	//Create the adapter for the items in the list
 		    	 ArrayAdapter<Venue> adapterVenues = new ArrayAdapter<Venue>(getActivity(), R.layout.element_venue_in_list, mVenuesList){
 
 				    	
@@ -168,10 +173,6 @@ public class VenueListFragment extends ListFragment {
 		
 		    @Override
 		    public void failure(RetrofitError retrofitError) {
-		    	//aq.dismiss(dialog);
-		    	
-		    	//setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-					//	android.R.layout.simple_list_item_activated_1));
 		    	
 		    	new AlertDialog.Builder(mAquery.getContext())
 				.setIcon(android.R.drawable.ic_dialog_alert)
@@ -198,7 +199,7 @@ public class VenueListFragment extends ListFragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 
-		// Restore the previously serialized activated item position.
+		// Restore the previously serialized activated venue position.
 		if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
 			setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
 		}
@@ -239,14 +240,14 @@ public class VenueListFragment extends ListFragment {
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		if (mActivatedPosition != ListView.INVALID_POSITION) {
-			// Serialize and persist the activated item position.
+			// Serialize and persist the activated venue position.
 			outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
 			
 		}
 	}
 
 	/**
-	 * Turns on activate-on-click mode. When this mode is on, list items will be
+	 * Turns on activate-on-click mode. When this mode is on, list venues will be
 	 * given the 'activated' state when touched.
 	 */
 	public void setActivateOnItemClick(boolean activateOnItemClick) {
