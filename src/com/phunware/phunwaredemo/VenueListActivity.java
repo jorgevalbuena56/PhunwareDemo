@@ -68,7 +68,7 @@ public class VenueListActivity extends ActionBarActivity implements
 			// adding or replacing the detail fragment using a
 			// fragment transaction.
 			Bundle arguments = new Bundle();
-			arguments.putSerializable(VenueDetailFragment.ARG_VENUE, venue);
+			arguments.putParcelable(VenueDetailFragment.ARG_VENUE, venue);
 			VenueDetailFragment fragment = new VenueDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()

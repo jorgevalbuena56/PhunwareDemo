@@ -37,7 +37,7 @@ public class VenueDetailActivity extends ActionBarActivity {
 			// Create the detail fragment and add it to the activity
 			// using a fragment transaction.
 			Bundle arguments = new Bundle();
-			arguments.putSerializable(VenueDetailFragment.ARG_VENUE, getIntent().getSerializableExtra(VenueDetailFragment.ARG_VENUE));
+			arguments.putParcelable(VenueDetailFragment.ARG_VENUE, getIntent().getParcelableExtra(VenueDetailFragment.ARG_VENUE));
 			VenueDetailFragment fragment = new VenueDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction().add(R.id.venue_detail_container, fragment).commit();

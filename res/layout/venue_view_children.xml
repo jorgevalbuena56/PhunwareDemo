@@ -1,22 +1,23 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
-
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="vertical" >
+  
     <TextView
         android:id="@+id/vTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Medium Text"
         android:padding="5dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:id="@+id/vDescription"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Small Text"
-        android:padding="5dp"
+        android:layout_height="wrap_content"        
+        android:paddingLeft="5dp"
         android:textAppearance="?android:attr/textAppearanceSmall" />
+
 
 </LinearLayout>

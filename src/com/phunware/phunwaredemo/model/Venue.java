@@ -1,7 +1,10 @@
 package com.phunware.phunwaredemo.model;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -10,8 +13,8 @@ import com.google.gson.annotations.SerializedName;
  * @author GeorgeLocal
  *
  */
-public class Venue implements Serializable{
- 
+public class Venue implements Parcelable {
+	 
 	// Core fields
 	@SerializedName("id")
 	private long mId;
@@ -203,4 +206,74 @@ public class Venue implements Serializable{
 		mImageUrl = imageUrl;
 	}
  
+
+    protected Venue(Parcel in) {
+        mId = in.readLong();
+        mPcode = in.readInt();
+        mLatitude = in.readDouble();
+        mLongitude = in.readDouble();
+        mName = in.readString();
+        mAddress = in.readString();
+        mCity = in.readString();
+        mState = in.readString();
+        mZip = in.readString();
+        mPhone = in.readString();
+        mTollFreePhone = in.readString();
+        mUrl = in.readString();
+        mDescription = in.readString();
+        mTicketLink = in.readString();
+        mImageUrl = in.readString();
+        
+        if (in.readByte() == 0x01) {
+            mSchedule = new ArrayList<ScheduleItem>();
+            in.readList(mSchedule, ScheduleItem.class.getClassLoader());
+        } else {
+            mSchedule = null;
+        }
+        mDistance = in.readFloat();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(mId);
+        dest.writeInt(mPcode);
+        dest.writeDouble(mLatitude);
+        dest.writeDouble(mLongitude);
+        dest.writeString(mName);
+        dest.writeString(mAddress);
+        dest.writeString(mCity);
+        dest.writeString(mState);
+        dest.writeString(mZip);
+        dest.writeString(mPhone);
+        dest.writeString(mTollFreePhone);
+        dest.writeString(mUrl);
+        dest.writeString(mDescription);
+        dest.writeString(mTicketLink);
+        dest.writeString(mImageUrl);
+        if (mSchedule == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(mSchedule);
+        }
+        dest.writeFloat(mDistance);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<Venue> CREATOR = new Parcelable.Creator<Venue>() {
+        @Override
+        public Venue createFromParcel(Parcel in) {
+            return new Venue(in);
+        }
+
+        @Override
+        public Venue[] newArray(int size) {
+            return new Venue[size];
+        }
+    };
 }

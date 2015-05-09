@@ -24,6 +24,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.phunware.phunwaredemo.R;
+import com.phunware.phunwaredemo.adapter.VenueAdapter;
 import com.phunware.phunwaredemo.model.Venue;
 import com.phunware.phunwaredemo.service.VenueService;
 import com.phunware.phunwaredemo.utils.ConfigFactory;
@@ -124,51 +125,9 @@ public class VenueListFragment extends ListFragment {
 		
 		Callback<List<Venue>> callback = new Callback<List<Venue>>(){
 		    @Override
-		    public void success(List<Venue> v, Response response) {		    	
-		    	mVenuesList = v;
-		    	
-		    	//Create the adapter for the items in the list
-		    	 ArrayAdapter<Venue> adapterVenues = new ArrayAdapter<Venue>(getActivity(), R.layout.element_venue_in_list, mVenuesList){
-
-				    	
-						@Override
-						public View getDropDownView(int position, View convertView,
-								ViewGroup parent) {
-							
-					    	ViewHolderItem viewHolder;
-					        
-					    	if (convertView == null) {  
-
-					    		LayoutInflater inflater = getActivity().getLayoutInflater();
-					    		convertView = inflater.inflate(R.layout.element_venue_in_list, parent, false);
-
-					    		viewHolder = new ViewHolderItem();
-					    		viewHolder.txtVenueTitle = (TextView) convertView.findViewById(R.id.vTitle);
-					    		viewHolder.txtVenueAddress = (TextView) convertView.findViewById(R.id.vDescription);
-					    		convertView.setTag(viewHolder);
-					    		
-					    	}else{
-					    		
-					    		viewHolder = (ViewHolderItem) convertView.getTag();
-					    	}
-					        
-					    	final Venue venue = getItem(position);
-					    	
-					    	viewHolder.txtVenueTitle.setText(venue.getName());
-					    	viewHolder.txtVenueAddress.setText(venue.getAddress());
-							return convertView;			
-							
-						}
-						
-						@Override
-						public View getView(int position, View convertView, ViewGroup parent) {
-							// TODO Auto-generated method stub
-							return getDropDownView(position, convertView, parent);
-						}
-
-				    };
-				    
-		    	setListAdapter(adapterVenues);
+		    public void success(List<Venue> venues, Response response) {		    	
+		    	mVenuesList = venues;
+		    	setListAdapter(new VenueAdapter(getActivity(), mVenuesList));
 		    }
 		
 		    @Override

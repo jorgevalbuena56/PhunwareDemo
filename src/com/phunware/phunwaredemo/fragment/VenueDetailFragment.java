@@ -58,7 +58,7 @@ public class VenueDetailFragment extends Fragment {
 			// Load the venue specified by the fragment
 			// arguments. Instead of calling for the details, all the object is passed by to
 			// the fragment.
-			mVenue = (Venue)getArguments().getSerializable(ARG_VENUE);
+			mVenue = (Venue)getArguments().getParcelable(ARG_VENUE);
 		}
 		
 	}
@@ -83,26 +83,7 @@ public class VenueDetailFragment extends Fragment {
 			if(mVenue.getSchedule() != null){				
 
 		        ArrayAdapter<ScheduleItem> adapter = new ArrayAdapter<ScheduleItem>(getActivity(),
-		                    android.R.layout.simple_list_item_1, mVenue.getSchedule()){
-
-								@Override
-								public View getView(int position,
-										View convertView, ViewGroup parent) {
-									
-									TextView textView = (TextView) super.getView(position, convertView, parent);
-
-									
-							        ScheduleItem schedule = getItem(position);
-							        StringBuilder builder = new StringBuilder(android.text.format.DateFormat.format("E M/dd h:mm a", schedule.getStartDate()))
-							        							.append(" ").append(getResources().getString(R.string.to)).append(" ")
-							        							.append(android.text.format.DateFormat.format("h:mm a", schedule.getEndDate()));
-							        textView.setText(builder.toString());
-
-							        return textView;
-								}
-		        
-		        	
-		        };
+		                    android.R.layout.simple_list_item_1, mVenue.getSchedule());
 		       
 		        mAquery.id(R.id.vScheduleList).adapter(adapter);
 		        mAquery.id(R.id.vScheduleList).visibility(View.VISIBLE);	
