@@ -12,12 +12,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.androidquery.AQuery;
 import com.google.gson.FieldNamingPolicy;
@@ -27,8 +23,6 @@ import com.phunware.phunwaredemo.R;
 import com.phunware.phunwaredemo.adapter.VenueAdapter;
 import com.phunware.phunwaredemo.model.Venue;
 import com.phunware.phunwaredemo.service.VenueService;
-import com.phunware.phunwaredemo.utils.ConfigFactory;
-import com.phunware.phunwaredemo.utils.Utils.ViewHolderItem;
 
 /**
  * A list fragment representing a list of Venues. This fragment also supports
@@ -116,7 +110,7 @@ public class VenueListFragment extends ListFragment {
 		//The url is store in a properties file in the asset folder which give us flexibility
 		//if the server changes.
 		RestAdapter restAdapter = new RestAdapter.Builder()
-		.setEndpoint(ConfigFactory.getInstance(getActivity()).get("aws.url").toString())
+		.setEndpoint(getResources().getString(R.string.ws_url))
 		.setConverter(new GsonConverter(gson))
 		.build();
 
