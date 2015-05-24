@@ -2,6 +2,9 @@ package com.phunware.phunwaredemo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.KeyEvent;
 
@@ -25,19 +28,14 @@ import com.phunware.phunwaredemo.utils.Utils;
  * This activity also implements the required
  * {@link VenueListFragment.Callbacks} interface to listen for item selections.
  */
-public class VenueListActivity extends ActionBarActivity implements
+public class VenueListActivity extends SingleFragmentActivity implements
 		VenueListFragment.Callbacks {
 
-	/**
-	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-	 * device.
-	 */
-	private boolean mTwoPane;
-
+/*	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_venue_list);
+		setContentView(R.layout.activity_list);
 
 		// Show the Up button in the action bar.
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -56,23 +54,34 @@ public class VenueListActivity extends ActionBarActivity implements
 					R.id.venue_list)).setActivateOnItemClick(true);
 		}
 	}
-
+*/
 	/**
 	 * Callback method from {@link VenueListFragment.Callbacks} indicating that
 	 * the item with the given ID was selected.
 	 */
 	@Override
 	public void onItemSelected(Venue venue) {
-		if (mTwoPane) {
+		if (findViewById(R.id.detail_fragment_container) != null) {
 			// In two-pane mode, show the detail view in this activity by
 			// adding or replacing the detail fragment using a
 			// fragment transaction.
+			
+			FragmentManager fm = getSupportFragmentManager();
+			FragmentTransaction ft = fm.beginTransaction();
+			
+			Fragment oldDetail = fm.findFragmentById(R.id.detail_fragment_container);
+
 			Bundle arguments = new Bundle();
 			arguments.putParcelable(VenueDetailFragment.ARG_VENUE, venue);
-			VenueDetailFragment fragment = new VenueDetailFragment();
-			fragment.setArguments(arguments);
-			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.venue_detail_container, fragment).commit();
+			VenueDetailFragment newDetail = VenueDetailFragment.newInstance(venue);
+			newDetail.setArguments(arguments);
+
+			if (oldDetail != null) {
+				ft.remove(oldDetail);
+			}
+			
+			ft.add(R.id.detail_fragment_container, newDetail);
+			ft.commit();
 
 		} else {
 			// In single-pane mode, simply start the detail activity
@@ -95,5 +104,15 @@ public class VenueListActivity extends ActionBarActivity implements
 	    	Utils.closeApplicationMessage(this);		   		        		        
 	    }
 	    return false;
+	}
+
+	@Override
+	protected Fragment createFragment() {		
+		return VenueListFragment.newInstance();
+	}
+	
+	@Override
+	protected int getLayoutResId() {
+		return R.layout.activity_masterdetail;
 	}
 }

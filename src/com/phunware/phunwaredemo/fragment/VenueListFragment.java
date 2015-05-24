@@ -1,12 +1,5 @@
 package com.phunware.phunwaredemo.fragment;
 
-import java.util.List;
-
-import retrofit.Callback;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-import retrofit.converter.GsonConverter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -15,14 +8,13 @@ import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ListView;
 
-import com.androidquery.AQuery;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.phunware.phunwaredemo.R;
 import com.phunware.phunwaredemo.adapter.VenueAdapter;
+import com.phunware.phunwaredemo.async.VenueClient;
+import com.phunware.phunwaredemo.bus.BusProvider;
+import com.phunware.phunwaredemo.event.VenueErrorEvent;
+import com.phunware.phunwaredemo.event.VenueEvent;
 import com.phunware.phunwaredemo.model.Venue;
-import com.phunware.phunwaredemo.service.VenueService;
 
 /**
  * A list fragment representing a list of Venues. This fragment also supports
@@ -41,6 +33,7 @@ public class VenueListFragment extends ListFragment {
 	 */
 	private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
+	private static final String VENUE_ARG = "fragment.venue.arg";
 	/**
 	 * A callback interface that all activities containing this fragment must
 	 * implement. This mechanism allows activities to be notified of venue
@@ -54,27 +47,15 @@ public class VenueListFragment extends ListFragment {
 	}
 
 	/**
-	 * A dummy implementation of the {@link Callbacks} interface that does
-	 * nothing. Used only when this fragment is not attached to an activity.
-	 */
-	private static Callbacks sDummyCallbacks = new Callbacks() {
-		public void onItemSelected(Venue venue) {
-		}
-	};
-
-	/**
 	 * The fragment's current callback object, which is notified of list item
 	 * clicks.
 	 */
-	private Callbacks mCallbacks = sDummyCallbacks;
+	private Callbacks mCallbacks;
 
 	/**
 	 * The current activated venue position. Only used on tablets.
 	 */
 	private int mActivatedPosition = ListView.INVALID_POSITION;
-
-	private AQuery mAquery;
-	private List<Venue> mVenuesList;
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -83,71 +64,71 @@ public class VenueListFragment extends ListFragment {
 	public VenueListFragment() {
 	}
 
+	public static VenueListFragment newInstance(){
+		return new VenueListFragment();
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		// Retain this fragment across configuration changes.
-	    setRetainInstance(true);
-	    
-	    if(mVenuesList == null)
-	    	retrieveDateWS();
+
 	}
 
 	/**
-	 * This Method is the one in charge to connect with the Rest Service and retrieve
-	 * the venue's data. It uses Retrofit to create the http connection ans Gson to deserialize
-	 * and convert into the Venue Objet
+	 * Called when the bus posts an event for successful result.
+	 * 
+	 * <br>Call onEvent: Called in the same thread (default)
+	 * <br>Call onEventMainThread: Called in Android UI's main thread
+	 * <br>Call onEventBackgroundThread: Called in the background thread
+	 * <br>Call onEventAsync: Called in a separate thread
+	 * 
+	 * @param event
 	 */
-	private void retrieveDateWS(){
-		
-		
-		Gson gson = new GsonBuilder()
-		.setDateFormat("yyyy-MM-dd HH:mm:ss Z")
-	    .setFieldNamingPolicy(FieldNamingPolicy.IDENTITY)
-	    .create();
-		
-		//The url is store in a properties file in the asset folder which give us flexibility
-		//if the server changes.
-		RestAdapter restAdapter = new RestAdapter.Builder()
-		.setEndpoint(getResources().getString(R.string.ws_url))
-		.setConverter(new GsonConverter(gson))
-		.build();
-
-		VenueService service = restAdapter.create(VenueService.class);
-		
-		
-		Callback<List<Venue>> callback = new Callback<List<Venue>>(){
-		    @Override
-		    public void success(List<Venue> venues, Response response) {		    	
-		    	mVenuesList = venues;
-		    	setListAdapter(new VenueAdapter(getActivity(), mVenuesList));
-		    }
-		
-		    @Override
-		    public void failure(RetrofitError retrofitError) {
-		    	
-		    	new AlertDialog.Builder(mAquery.getContext())
-				.setIcon(android.R.drawable.ic_dialog_alert)
-				.setTitle(R.string.error)
-				.setMessage(R.string.error_getting_info)
-				.setPositiveButton(R.string.exit_ok, new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						((Activity)mAquery.getContext()).finish(); 
-					}
-
-				})				
-				.show();
-		    	
-		    }
-		
-		};
-		
-		service.listVenues(callback);
+	public void onEvent(VenueEvent  event) {
+    	setListAdapter(new VenueAdapter(getActivity(), event.result.lstVenues));		
 	}
 	
+	/**
+	 * Called when the bus posts an event for error result.
+	 * 
+	 * @param event
+	 */
+	public void onEvent(VenueErrorEvent  event) {
+		
+		new AlertDialog.Builder(getActivity())
+		.setIcon(android.R.drawable.ic_dialog_alert)
+		.setTitle(R.string.error)
+		.setMessage(R.string.error_getting_info)
+		.setPositiveButton(R.string.exit_ok, new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				getActivity().finish(); 
+			}
+
+		})				
+		.show();
+    			
+	}
+	
+
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		
+		BusProvider.getInstance().unregister(this);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		
+		BusProvider.getInstance().register(this);
+
+		VenueClient.get(getActivity()).retrieveDateWS();
+	}
+
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -176,7 +157,7 @@ public class VenueListFragment extends ListFragment {
 		super.onDetach();
 
 		// Reset the active callbacks interface to the dummy implementation.
-		mCallbacks = sDummyCallbacks;
+		mCallbacks = null;
 	}
 
 	@Override

@@ -50,6 +50,14 @@ public class VenueDetailFragment extends Fragment {
 	public VenueDetailFragment() {
 	}
 
+	public static VenueDetailFragment newInstance(Venue venue) {
+		Bundle args = new Bundle();
+		args.putParcelable(ARG_VENUE, venue);
+		VenueDetailFragment fragment = new VenueDetailFragment();
+		fragment.setArguments(args);
+		return fragment;
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -111,7 +119,11 @@ public class VenueDetailFragment extends Fragment {
 		        shareIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, mVenue.getName());
 		        shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, mVenue.getDescription());        	
 		        shareIntent.setType("text/plain");
-		        startActivity(shareIntent);
+		        // Verify that there are applications registered to handle this intent
+		        // (resolveActivity returns null if none are registered)
+		        if (shareIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+		            startActivity(shareIntent);
+		        } 
 				return false;
 			}
 		});
